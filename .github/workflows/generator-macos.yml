@@ -106,6 +106,10 @@ jobs:
             core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
             core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
+      - name: Guardar emenda Ankora
+        # o checkout do rustdesk abaixo apaga o workspace, entao copia antes
+        run: cp ankora/remote-1.4.9.patch "$RUNNER_TEMP/remote-1.4.9.patch"
+
       - name: Checkout source code
         if: ${{ env.VERSION != 'master' }}
         uses: actions/checkout@v4
@@ -120,6 +124,10 @@ jobs:
         with:
             repository: rustdesk/rustdesk
             submodules: recursive
+
+      - name: Aplicar emenda Ankora
+        # antes de qualquer sed; sem continue-on-error: se nao encaixar, o job falha
+        run: git apply --verbose "$RUNNER_TEMP/remote-1.4.9.patch"
 
       - name: Install imagemagick and potrace and nasm and and
         shell: bash
